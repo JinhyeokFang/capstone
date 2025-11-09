@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -20,9 +21,14 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 
+    group = "uk.jinhy.capstone"
+}
+
+subprojects {
     group = "uk.jinhy.capstone"
 
     apply(plugin = "io.spring.dependency-management")
@@ -32,10 +38,29 @@ allprojects {
     apply(plugin = "org.jetbrains.kotlin.kapt")
     apply(plugin = "kotlin-noarg")
 
-    noArg {
+    configure<org.jetbrains.kotlin.noarg.gradle.NoArgExtension> {
         annotation("jakarta.persistence.Entity")
         annotation("jakarta.persistence.MappedSuperclass")
         annotation("jakarta.persistence.Embeddable")
+    }
+
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.VERSION_21
+    }
+
+    configurations {
+        getByName("compileOnly") {
+            extendsFrom(configurations.getByName("annotationProcessor"))
+        }
+    }
+
+    dependencies {
+        add("implementation", "org.jetbrains.kotlin:kotlin-reflect:1.9.25")
+        add("implementation", "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.25")
+
+        add("testImplementation", "io.kotest:kotest-runner-junit5:5.8.0")
+        add("testImplementation", "io.kotest:kotest-assertions-core:5.8.0")
+        add("testImplementation", "io.kotest.extensions:kotest-extensions-spring:1.1.3")
     }
 
     tasks.withType<Test> {
@@ -43,37 +68,6 @@ allprojects {
     }
 
     extra["queryDslVersion"] = "5.1.0"
-}
-
-subprojects {
-    group = "uk.jinhy.capstone"
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_21
-    }
-
-    configurations {
-        compileOnly {
-            extendsFrom(configurations.annotationProcessor.get())
-        }
-    }
-
-    the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
-        imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.8")
-            mavenBom("com.fasterxml.jackson:jackson-bom:2.17.3")
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.6")
-        }
-    }
-
-    dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-reflect")
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-        testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
-        testImplementation("io.kotest:kotest-assertions-core:5.8.0")
-        testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
-    }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
