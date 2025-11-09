@@ -1,7 +1,8 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
+apply(plugin = "org.springframework.boot")
+
 plugins {
-    id("org.springframework.boot")
     id("com.github.ryarnyah.querydsl") version "0.0.3"
     kotlin("kapt")
 }

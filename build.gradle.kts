@@ -4,20 +4,28 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-plugins {
-    val springBootVersion = "3.3.8"
-    val springDependencyManagementVersion = "1.1.7"
-    val kotlinVersion = "1.9.25"
-
-    id("org.springframework.boot") version springBootVersion apply false
-    id("io.spring.dependency-management") version springDependencyManagementVersion
-    id("org.jlleitschuh.gradle.ktlint") version "11.5.1"
-    id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
-    kotlin("kapt") version kotlinVersion
-    kotlin("jvm") version kotlinVersion
-    kotlin("plugin.spring") version kotlinVersion
-    kotlin("plugin.jpa") version kotlinVersion
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:3.3.8")
+        classpath("io.spring.gradle:dependency-management-plugin:1.1.7")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:11.5.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:1.9.25")
+        classpath("org.jetbrains.kotlin:kotlin-noarg:1.9.25")
+    }
 }
+
+apply(plugin = "io.spring.dependency-management")
+apply(plugin = "org.jlleitschuh.gradle.ktlint")
+apply(plugin = "org.jetbrains.kotlin.jvm")
+apply(plugin = "org.jetbrains.kotlin.kapt")
+apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+apply(plugin = "kotlin-noarg")
 
 allprojects {
     repositories {
