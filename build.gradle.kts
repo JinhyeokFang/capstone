@@ -4,19 +4,18 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-plugins {
-    val springBootVersion = "3.3.8"
-    val springDependencyManagementVersion = "1.1.7"
-    val kotlinVersion = "1.9.25"
-
-    id("org.springframework.boot") version springBootVersion apply false
-    id("io.spring.dependency-management") version springDependencyManagementVersion
-    id("org.jlleitschuh.gradle.ktlint") version "11.5.1"
-    id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
-    kotlin("kapt") version kotlinVersion
-    kotlin("jvm") version kotlinVersion
-    kotlin("plugin.spring") version kotlinVersion
-    kotlin("plugin.jpa") version kotlinVersion
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:3.3.8")
+        classpath("io.spring.gradle:dependency-management-plugin:1.1.7")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:1.9.25")
+        classpath("org.jetbrains.kotlin:kotlin-noarg:1.9.25")
+    }
 }
 
 allprojects {
@@ -24,30 +23,19 @@ allprojects {
         mavenCentral()
     }
 
-    apply {
-        plugin("org.jlleitschuh.gradle.ktlint")
-        plugin("io.spring.dependency-management")
-        plugin("org.jetbrains.kotlin.jvm")
-        plugin("org.jetbrains.kotlin.plugin.spring")
-        plugin("org.jetbrains.kotlin.plugin.jpa")
-        plugin("org.jetbrains.kotlin.kapt")
-        plugin("kotlin-noarg")
-    }
+    group = "uk.jinhy.capstone"
+
+    apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+    apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+    apply(plugin = "org.jetbrains.kotlin.kapt")
+    apply(plugin = "kotlin-noarg")
 
     noArg {
         annotation("jakarta.persistence.Entity")
         annotation("jakarta.persistence.MappedSuperclass")
         annotation("jakarta.persistence.Embeddable")
-    }
-
-    ktlint {
-        version.set("0.50.0")
-        verbose.set(true)
-        filter {
-            exclude {
-                it.file.path.contains("build/")
-            }
-        }
     }
 
     tasks.withType<Test> {
@@ -58,14 +46,6 @@ allprojects {
 }
 
 subprojects {
-    apply {
-        plugin("kotlin-kapt")
-        plugin("kotlin-jpa")
-        plugin("kotlin-spring")
-        plugin("io.spring.dependency-management")
-        plugin("org.jetbrains.kotlin.jvm")
-    }
-
     group = "uk.jinhy.capstone"
 
     java {
@@ -78,7 +58,7 @@ subprojects {
         }
     }
 
-    dependencyManagement {
+    the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.8")
             mavenBom("com.fasterxml.jackson:jackson-bom:2.17.3")
@@ -110,7 +90,6 @@ subprojects {
             "-Duser.timezone=UTC",
         )
         useJUnitPlatform()
-        dependsOn(tasks.ktlintCheck)
         testLogging {
             events(
                 FAILED,
