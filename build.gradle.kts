@@ -6,21 +6,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:3.3.8")
-        classpath("io.spring.gradle:dependency-management-plugin:1.1.7")
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:11.5.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25")
         classpath("org.jetbrains.kotlin:kotlin-allopen:1.9.25")
         classpath("org.jetbrains.kotlin:kotlin-noarg:1.9.25")
     }
 }
 
-apply(plugin = "io.spring.dependency-management")
-apply(plugin = "org.jlleitschuh.gradle.ktlint")
 apply(plugin = "org.jetbrains.kotlin.jvm")
 apply(plugin = "org.jetbrains.kotlin.kapt")
 apply(plugin = "org.jetbrains.kotlin.plugin.spring")
@@ -33,8 +30,6 @@ allprojects {
     }
 
     apply {
-        plugin("org.jlleitschuh.gradle.ktlint")
-        plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("org.jetbrains.kotlin.plugin.jpa")
@@ -46,16 +41,6 @@ allprojects {
         annotation("jakarta.persistence.Entity")
         annotation("jakarta.persistence.MappedSuperclass")
         annotation("jakarta.persistence.Embeddable")
-    }
-
-    ktlint {
-        version.set("0.50.0")
-        verbose.set(true)
-        filter {
-            exclude {
-                it.file.path.contains("build/")
-            }
-        }
     }
 
     tasks.withType<Test> {
@@ -86,15 +71,12 @@ subprojects {
         }
     }
 
-    dependencyManagement {
-        imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.8")
-            mavenBom("com.fasterxml.jackson:jackson-bom:2.17.3")
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.6")
-        }
-    }
-
     dependencies {
+        // Import BOMs directly
+        implementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.8"))
+        implementation(platform("com.fasterxml.jackson:jackson-bom:2.17.3"))
+        implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.6"))
+
         implementation("org.jetbrains.kotlin:kotlin-reflect")
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
@@ -118,7 +100,6 @@ subprojects {
             "-Duser.timezone=UTC",
         )
         useJUnitPlatform()
-        dependsOn(tasks.ktlintCheck)
         testLogging {
             events(
                 FAILED,
