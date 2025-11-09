@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(./gradlew clean test:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew ktlintFormat:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(./gradlew:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": false
+}

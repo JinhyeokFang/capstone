@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-jammy AS builder
+FROM gradle:8.14-jdk21 AS builder
 
 WORKDIR /app
 
@@ -12,15 +12,17 @@ COPY api/build.gradle.kts api/
 
 RUN chmod +x gradlew
 
+RUN ./gradlew --no-daemon dependencies --parallel || true
+
 COPY . .
 
-RUN ./gradlew clean --no-daemon :api:bootJar -x test
+RUN ./gradlew --no-daemon :api:bootJar -x test --parallel --build-cache
 
 RUN cd api/build/libs && \
     JAR_NAME=$(ls -1 *.jar | grep -v 'plain' | head -n 1) && \
     mv "$JAR_NAME" app.jar
 
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:21-jre
 
 ENV TZ=Asia/Seoul
 RUN apt-get update && apt-get install -y tzdata && \
