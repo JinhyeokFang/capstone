@@ -26,7 +26,7 @@ class AuthIntegrationTest(
 ) : BehaviorSpec({
     extensions(SpringExtension)
 
-    fun baseUrl() = "http://localhost:$port/api/auth"
+    fun baseUrl() = "http://localhost:$port/api/v1/auth"
 
     beforeEach {
         userRepository.deleteAll()

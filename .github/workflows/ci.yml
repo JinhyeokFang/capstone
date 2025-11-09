@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - 'claude/**'
   pull_request:
     branches:
       - main
@@ -40,6 +41,16 @@ jobs:
         run: ./gradlew clean build
         env:
           DOCKER_HOST: unix:///var/run/docker.sock
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: application-jar
+          path: |
+            **/build/libs/*.jar
+            !**/build/libs/*-plain.jar
+          retention-days: 7
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

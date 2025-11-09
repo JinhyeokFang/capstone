@@ -4,7 +4,7 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
-  
+
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -13,15 +13,17 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
     show-sql: true
-  
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      timeout: 1000ms
+
+  cache:
+    type: none
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
 
 jwt:
-  secret: test-secret-key-for-testing-purposes-only-minimum-256-bits
-  expiration: 3600000
+  secret-key: test-secret-key-for-testing-purposes-only-minimum-256-bits-required
+  expiration-millis: 3600000
 
 

@@ -64,7 +64,7 @@ class AuthControllerTest(
 
         When("로그인 API를 호출하면") {
             val result = mockMvc.perform(
-                post("/api/auth/login")
+                post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -84,7 +84,7 @@ class AuthControllerTest(
         When("로그인 API를 호출하면") {
             val invalidRequest = """{"password": "password123"}"""
             val result = mockMvc.perform(
-                post("/api/auth/login")
+                post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(invalidRequest),
             )
@@ -99,7 +99,7 @@ class AuthControllerTest(
         When("로그인 API를 호출하면") {
             val invalidRequest = """{"email": "test@example.com"}"""
             val result = mockMvc.perform(
-                post("/api/auth/login")
+                post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(invalidRequest),
             )
@@ -114,7 +114,7 @@ class AuthControllerTest(
         When("로그인 API를 호출하면") {
             val invalidRequest = """{"email": "invalid-email", "password": "password123"}"""
             val result = mockMvc.perform(
-                post("/api/auth/login")
+                post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(invalidRequest),
             )
@@ -138,7 +138,7 @@ class AuthControllerTest(
 
         When("로그인 API를 호출하면") {
             val result = mockMvc.perform(
-                post("/api/auth/login")
+                post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )

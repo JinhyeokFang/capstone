@@ -10,11 +10,11 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import uk.jinhy.capstone.api.auth.repository.entity.UserEntity
 import uk.jinhy.capstone.domain.user.model.User
-import uk.jinhy.capstone.infra.querydsl.QuerydslConfig
+import uk.jinhy.capstone.infra.querydsl.JpaConfig
 import java.time.Instant
 
 @DataJpaTest
-@Import(QuerydslConfig::class, UserRepositoryImpl::class)
+@Import(JpaConfig::class, UserRepositoryImpl::class)
 @ActiveProfiles("test")
 class UserRepositoryTest(
     private val userRepository: UserRepository,
