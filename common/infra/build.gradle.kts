@@ -12,13 +12,15 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.3")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+    // Temporarily commented out due to BOM dependency issues
+    // implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 
     implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
     kapt("com.querydsl:querydsl-apt:5.1.0:jakarta")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.5")
-    implementation("io.github.openfeign:feign-okhttp:13.1")
+    // Temporarily commented out due to BOM dependency issues
+    // implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.5")
+    // implementation("io.github.openfeign:feign-okhttp:13.1")
 
     implementation("io.micrometer:micrometer-core:1.13.9")
 

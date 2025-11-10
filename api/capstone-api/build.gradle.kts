@@ -16,25 +16,29 @@ dependencies {
     implementation(project(":common:util"))
     implementation(project(":common:infra"))
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.3.8")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.3.8")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc:3.3.8")
+    implementation("org.springframework.boot:spring-boot-starter-validation:3.3.8")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:3.3.8")
+    implementation("org.springframework.boot:spring-boot-starter-security:3.3.8")
 
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.3")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.3")
 
-    implementation("org.redisson:redisson-spring-boot-starter:3.24.3")
+    // Temporarily commented out due to parent POM dependency issues
+    // implementation("org.redisson:redisson-spring-boot-starter:3.24.3")
 
     implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
     kapt("com.querydsl:querydsl-apt:5.1.0:jakarta")
-    kapt("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+    // Temporarily commented out due to BOM dependency issues
+    // kapt("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+    // Temporarily commented out due to BOM dependency issues
+    // implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    // Temporarily commented out due to parent POM dependency issues
+    // runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.13.9")
 
     runtimeOnly("com.mysql:mysql-connector-j:9.2.0")
 
