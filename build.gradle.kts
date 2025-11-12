@@ -40,10 +40,6 @@ allprojects {
         annotation("jakarta.persistence.Embeddable")
     }
 
-    repositories {
-        mavenCentral()
-    }
-
     ktlint {
         version.set("0.50.0")
         verbose.set(true)
@@ -114,9 +110,7 @@ subprojects {
             "-Duser.timezone=UTC",
         )
         useJUnitPlatform()
-
         dependsOn(tasks.ktlintCheck)
-
         testLogging {
             events(
                 FAILED,

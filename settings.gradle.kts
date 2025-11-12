@@ -1,5 +1,7 @@
 rootProject.name = "Capstone"
 
-include("common-domain")
-include("common-util")
-include("api")
+include("domain")
+include("common:util")
+include("common:infra")
+include("common:test")
+include("api:capstone-api")

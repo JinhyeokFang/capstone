@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-jammy AS builder
+FROM gradle:8.14-jdk21 AS builder
 
 WORKDIR /app
 
@@ -6,21 +6,25 @@ COPY gradlew ./
 COPY gradle ./gradle
 COPY settings.gradle.kts .
 COPY build.gradle.kts .
-COPY common-domain/build.gradle.kts common-domain/
-COPY common-util/build.gradle.kts common-util/
-COPY api/build.gradle.kts api/
+COPY domain/build.gradle.kts domain/
+COPY common/util/build.gradle.kts common/util/
+COPY common/infra/build.gradle.kts common/infra/
+COPY common/test/build.gradle.kts common/test/
+COPY api/capstone-api/build.gradle.kts api/capstone-api/
 
 RUN chmod +x gradlew
 
+RUN ./gradlew --no-daemon dependencies --parallel || true
+
 COPY . .
 
-RUN ./gradlew clean --no-daemon :api:bootJar -x test
+RUN ./gradlew --no-daemon :api:capstone-api:bootJar -x test --parallel --build-cache
 
-RUN cd api/build/libs && \
+RUN cd api/capstone-api/build/libs && \
     JAR_NAME=$(ls -1 *.jar | grep -v 'plain' | head -n 1) && \
     mv "$JAR_NAME" app.jar
 
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:21-jre
 
 ENV TZ=Asia/Seoul
 RUN apt-get update && apt-get install -y tzdata && \
@@ -29,7 +33,7 @@ RUN apt-get update && apt-get install -y tzdata && \
 
 WORKDIR /app
 
-COPY --from=builder /app/api/build/libs/app.jar /app/app.jar
+COPY --from=builder /app/api/capstone-api/build/libs/app.jar /app/app.jar
 
 RUN groupadd -r spring && useradd -r -g spring spring && \
     chown -R spring:spring /app
