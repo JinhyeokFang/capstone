@@ -1,0 +1,69 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  K8S_REPO: JinhyeokFang/k8s-infra
+  K8S_VALUES_PATH: capstone/values.yaml
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-24.04-arm
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate image name and tag
+        id: image
+        run: |
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          BUILD_NUMBER=${{ github.run_number }}
+          IMAGE_NAME="ghcr.io/${REPO_OWNER_LOWER}/capstone"
+          IMAGE_TAG="build-${BUILD_NUMBER}"
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "BUILD_NUMBER=${BUILD_NUMBER}" >> $GITHUB_OUTPUT
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t ${{ steps.image.outputs.IMAGE_NAME }}:${{ steps.image.outputs.IMAGE_TAG }} -t ${{ steps.image.outputs.IMAGE_NAME }}:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ steps.image.outputs.IMAGE_NAME }}:${{ steps.image.outputs.IMAGE_TAG }}
+          docker push ${{ steps.image.outputs.IMAGE_NAME }}:latest
+
+      - name: Update K8s config
+        env:
+          GH_TOKEN: ${{ secrets.K8S_REPO_TOKEN }}
+          IMAGE_TAG: ${{ steps.image.outputs.IMAGE_TAG }}
+          BUILD_NUMBER: ${{ steps.image.outputs.BUILD_NUMBER }}
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions Bot"
+
+          git clone https://oauth2:${GH_TOKEN}@github.com/${K8S_REPO}.git k8s-infra
+          cd k8s-infra
+
+          sed -i "s|^\(\s*tag:\s*\).*|\1${IMAGE_TAG}|" ${K8S_VALUES_PATH}
+
+          git add ${K8S_VALUES_PATH}
+          git commit -m "Update Capstone image tag to ${IMAGE_TAG} [GitHub Actions Build #${BUILD_NUMBER}]"
+          git push
+
+          echo "K8s 인프라 저장소의 ${K8S_VALUES_PATH} 파일의 tag가 '${IMAGE_TAG}'로 업데이트되었습니다."
+
