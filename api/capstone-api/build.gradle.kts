@@ -54,6 +54,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mysql:1.19.3")
+    testImplementation("org.testcontainers:redis:1.19.3")
     testRuntimeOnly("com.h2database:h2")
 }
 
