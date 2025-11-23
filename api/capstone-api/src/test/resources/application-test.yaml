@@ -18,7 +18,8 @@ spring:
     type: none
 
 jwt:
-  secret: test-secret-key-for-testing-purposes-only-minimum-256-bits
-  expiration: 3600000
+  secret-key: test-secret-key-for-testing-purposes-only-minimum-256-bits
+  access-token-expiration-millis: 3600000
+  refresh-token-expiration-millis: 604800000
 
 
