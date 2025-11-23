@@ -17,7 +17,6 @@ import uk.jinhy.capstone.api.auth.api.dto.request.AuthSignUpRequestDto
 import uk.jinhy.capstone.api.auth.repository.UserRepository
 import uk.jinhy.capstone.api.common.IntegrationTestBase
 import uk.jinhy.capstone.infra.auth.RefreshTokenBlocklistService
-import uk.jinhy.capstone.util.jwt.JwtUtil
 
 @AutoConfigureMockMvc
 class AuthControllerIntegrationTest : IntegrationTestBase() {
@@ -35,22 +34,14 @@ class AuthControllerIntegrationTest : IntegrationTestBase() {
     private lateinit var refreshTokenBlocklistService: RefreshTokenBlocklistService
 
     init {
-        beforeSpec {
-            JwtUtil.initialize(
-                secretKey = "test-secret-key-that-is-long-enough-for-hmac-sha-256-algorithm",
-                accessTokenExpirationMillis = 600000,
-                refreshTokenExpirationMillis = 604800000,
-            )
-        }
-
         beforeEach {
-            // 각 테스트 전에 데이터 정리
+            // 각 테스트 전에 데이터 정리는 자동으로 됨 (testcontainer rollback)
         }
 
         Given("새로운 사용자 정보가 주어졌을 때") {
             val signUpRequest = AuthSignUpRequestDto(
                 name = "Test User",
-                email = "test@example.com",
+                email = "signup-test-${System.currentTimeMillis()}@example.com",
                 password = "password123",
             )
 
@@ -88,7 +79,7 @@ class AuthControllerIntegrationTest : IntegrationTestBase() {
         Given("이미 존재하는 이메일로") {
             val signUpRequest = AuthSignUpRequestDto(
                 name = "Test User",
-                email = "existing@example.com",
+                email = "existing-${System.currentTimeMillis()}@example.com",
                 password = "password123",
             )
 
@@ -116,7 +107,7 @@ class AuthControllerIntegrationTest : IntegrationTestBase() {
         Given("등록된 사용자의 올바른 자격증명이 주어졌을 때") {
             val signUpRequest = AuthSignUpRequestDto(
                 name = "Login Test User",
-                email = "logintest@example.com",
+                email = "logintest-${System.currentTimeMillis()}@example.com",
                 password = "password123",
             )
 
@@ -157,7 +148,7 @@ class AuthControllerIntegrationTest : IntegrationTestBase() {
         Given("잘못된 비밀번호로") {
             val signUpRequest = AuthSignUpRequestDto(
                 name = "Wrong Password User",
-                email = "wrongpassword@example.com",
+                email = "wrongpassword-${System.currentTimeMillis()}@example.com",
                 password = "password123",
             )
 
@@ -190,7 +181,7 @@ class AuthControllerIntegrationTest : IntegrationTestBase() {
         Given("로그인한 사용자가") {
             val signUpRequest = AuthSignUpRequestDto(
                 name = "Me Test User",
-                email = "metest@example.com",
+                email = "metest-${System.currentTimeMillis()}@example.com",
                 password = "password123",
             )
 
@@ -222,7 +213,7 @@ class AuthControllerIntegrationTest : IntegrationTestBase() {
         Given("유효한 리프레시 토큰이 주어졌을 때") {
             val signUpRequest = AuthSignUpRequestDto(
                 name = "Refresh Test User",
-                email = "refreshtest@example.com",
+                email = "refreshtest-${System.currentTimeMillis()}@example.com",
                 password = "password123",
             )
 
@@ -253,7 +244,7 @@ class AuthControllerIntegrationTest : IntegrationTestBase() {
         Given("로그인한 사용자가 리프레시 토큰을 가지고") {
             val signUpRequest = AuthSignUpRequestDto(
                 name = "Logout Test User",
-                email = "logouttest@example.com",
+                email = "logouttest-${System.currentTimeMillis()}@example.com",
                 password = "password123",
             )
 
@@ -295,7 +286,7 @@ class AuthControllerIntegrationTest : IntegrationTestBase() {
         Given("로그아웃한 사용자의 리프레시 토큰으로") {
             val signUpRequest = AuthSignUpRequestDto(
                 name = "Blocklist Test User",
-                email = "blocklisttest@example.com",
+                email = "blocklisttest-${System.currentTimeMillis()}@example.com",
                 password = "password123",
             )
 

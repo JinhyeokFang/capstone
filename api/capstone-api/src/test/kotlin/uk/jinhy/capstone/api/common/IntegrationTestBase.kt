@@ -20,12 +20,12 @@ abstract class IntegrationTestBase : BehaviorSpec() {
                 withDatabaseName("test_db")
                 withUsername("test_user")
                 withPassword("test_password")
-                withReuse(true)
+                withReuse(false)
             }
 
         private val redisContainer = RedisContainer(DockerImageName.parse("redis:7-alpine"))
             .apply {
-                withReuse(true)
+                withReuse(false)
             }
 
         init {
@@ -39,7 +39,9 @@ abstract class IntegrationTestBase : BehaviorSpec() {
             registry.add("spring.datasource.url") { mysqlContainer.jdbcUrl }
             registry.add("spring.datasource.username") { mysqlContainer.username }
             registry.add("spring.datasource.password") { mysqlContainer.password }
+            registry.add("spring.datasource.driver-class-name") { "com.mysql.cj.jdbc.Driver" }
             registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+            registry.add("spring.jpa.database-platform") { "org.hibernate.dialect.MySQLDialect" }
 
             registry.add("spring.data.redis.host") { redisContainer.host }
             registry.add("spring.data.redis.port") { redisContainer.firstMappedPort }
