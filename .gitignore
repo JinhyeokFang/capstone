@@ -1,9 +1,8 @@
 HELP.md
 .gradle
-build/
+build
+bin
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
 
 ### STS ###
 .apt_generated
@@ -13,9 +12,6 @@ build/
 .settings
 .springBeans
 .sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
 .idea
@@ -38,11 +34,6 @@ out/
 
 ### Kotlin ###
 .kotlin
-
-### QueryDSL ###
-**/generated/
-**/Q*.java
-**/Q*.kt
 
 ### Keep empty directories ###
 !.gitkeep
