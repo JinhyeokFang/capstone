@@ -3,13 +3,15 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    driver-class-name: io.sentry.jdbc.SentryDriver
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
+      data-source-properties:
+        sentry.driver: com.p6spy.engine.spy.P6SpyDriver
 
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect

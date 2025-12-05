@@ -18,8 +18,7 @@ class GlobalExceptionHandler {
 
     private fun captureExceptionToSentry(exception: Exception, level: SentryLevel = SentryLevel.ERROR) {
         try {
-            val sentryKey = System.getenv("SENTRY_KEY")
-            if (sentryKey.isNullOrBlank()) {
+            if (!Sentry.isEnabled()) {
                 return
             }
 

@@ -1,10 +1,8 @@
 package uk.jinhy.capstone.infra.sentry
 
 import io.sentry.Sentry
-import jakarta.annotation.PostConstruct
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.web.servlet.HandlerInterceptor
@@ -14,19 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 @Profile("prod")
 class SentryConfig : WebMvcConfigurer {
-    private val logger = LoggerFactory.getLogger(SentryConfig::class.java)
-
-    @PostConstruct
-    fun init() {
-        val sentryDsn = System.getenv("SENTRY_DSN")
-        if (sentryDsn.isNullOrBlank()) {
-            logger.info("SENTRY_DSN not found, Sentry tracking disabled")
-            return
-        }
-
-        System.setProperty("sentry.dsn", sentryDsn)
-    }
-
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(SentryContextInterceptor())
     }
