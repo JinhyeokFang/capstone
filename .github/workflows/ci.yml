@@ -2,37 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8.0.36
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: capstone
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
 
     steps:
       - uses: actions/checkout@v4
@@ -58,6 +38,8 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -68,3 +50,41 @@ jobs:
             **/build/test-results/**/*.xml
             **/build/reports/tests/**/*
 
+      - name: Notify Slack on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{
+              "text": "❌ CI 빌드 실패",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "❌ CI 빌드 실패"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*저장소:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*브랜치:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*커밋:*\n<${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*작업:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|작업 보기>"
+                    }
+                  ]
+                }
+              ]
+            }' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
