@@ -1,0 +1,9 @@
+FROM mysql:8.4
+
+USER 0
+
+COPY ./init/ /docker-entrypoint-initdb.d/
+
+ENV TZ=UTC
+ENV MYSQL_ROOT_PASSWORD=root
+ENV MYSQL_DATABASE=capstone
