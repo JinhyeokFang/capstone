@@ -1,18 +1,21 @@
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val springBootVersion = "3.3.8"
+    val springBootVersion = "4.0.0"
     val springDependencyManagementVersion = "1.1.7"
-    val kotlinVersion = "1.9.25"
+    val kotlinVersion = "2.2.0"
 
     id("org.springframework.boot") version springBootVersion apply false
     id("io.spring.dependency-management") version springDependencyManagementVersion
     id("org.jlleitschuh.gradle.ktlint") version "11.5.1"
     id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
+    id("jacoco")
     kotlin("kapt") version kotlinVersion
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -40,10 +43,6 @@ allprojects {
         annotation("jakarta.persistence.Embeddable")
     }
 
-    repositories {
-        mavenCentral()
-    }
-
     ktlint {
         version.set("0.50.0")
         verbose.set(true)
@@ -68,12 +67,13 @@ subprojects {
         plugin("kotlin-spring")
         plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.jvm")
+        plugin("jacoco")
     }
 
     group = "uk.jinhy.capstone"
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_25
     }
 
     configurations {
@@ -84,9 +84,9 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.8")
-            mavenBom("com.fasterxml.jackson:jackson-bom:2.17.3")
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.6")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.0")
+            mavenBom("com.fasterxml.jackson:jackson-bom:2.18.0")
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2024.0.0")
         }
     }
 
@@ -102,7 +102,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs += "-Xjsr305=strict"
-            jvmTarget = "21"
+            jvmTarget = "25"
         }
     }
 
@@ -114,9 +114,8 @@ subprojects {
             "-Duser.timezone=UTC",
         )
         useJUnitPlatform()
-
         dependsOn(tasks.ktlintCheck)
-
+        finalizedBy(tasks.jacocoTestReport)
         testLogging {
             events(
                 FAILED,
@@ -128,5 +127,49 @@ subprojects {
             showCauses = true
             showStackTraces = true
         }
+    }
+
+    tasks.jacocoTestReport {
+        dependsOn(tasks.test)
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+            csv.required.set(false)
+        }
+    }
+
+    tasks.jacocoTestCoverageVerification {
+        dependsOn(tasks.jacocoTestReport)
+    }
+}
+
+tasks.register<JacocoReport>("jacocoRootReport") {
+    dependsOn(subprojects.map { it.tasks.test })
+    dependsOn(subprojects.map { it.tasks.jacocoTestReport })
+
+    additionalSourceDirs.setFrom(subprojects.map { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
+    sourceDirectories.setFrom(subprojects.map { it.the<SourceSetContainer>()["main"].allSource.srcDirs })
+    classDirectories.setFrom(
+        subprojects.map {
+            fileTree(it.buildDir) {
+                include("**/classes/**/main/**")
+                exclude("**/classes/**/main/**/dto/**")
+                exclude("**/classes/**/main/**/entity/**")
+                exclude("**/classes/**/main/**/config/**")
+            }
+        },
+    )
+    executionData.setFrom(
+        subprojects.map {
+            fileTree(it.buildDir) {
+                include("**/jacoco/test.exec")
+            }
+        },
+    )
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
     }
 }
