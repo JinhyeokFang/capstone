@@ -1,0 +1,57 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: ${DDL_AUTO:validate}
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+        use_sql_comments: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+
+logging:
+  level:
+    uk.jinhy.capstone: INFO
+    org.hibernate.SQL: WARN
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: production
+  traces-sample-rate: 0.1
+  enable-tracing: true
+  traces-profiler-enabled: true
+  attach-stacktrace: true
+  send-default-pii: true
+  max-breadcrumbs: 100
+  jdbc:
+    enabled: true
+    connection-timeout-threshold: 1000
+    query-timeout-threshold: 1000
+  servlet:
+    enabled: true
+  spring:
+    enabled: true
+  logback:
+    enabled: true
+
+
+

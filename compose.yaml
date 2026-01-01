@@ -1,13 +1,19 @@
 services:
   mysql:
     image: 'mysql:latest'
+    container_name: capstone-mysql
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      - 'MYSQL_DATABASE=capstone'
+      - 'MYSQL_ROOT_PASSWORD=root'
     ports:
-      - '3306'
+      - '3306:3306'
+    volumes:
+      - ./api/capstone-api/infra/docker/mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
